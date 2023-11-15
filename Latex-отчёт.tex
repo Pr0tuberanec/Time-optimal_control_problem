@@ -1,0 +1,460 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}	
+\usepackage[T1, T2A]{fontenc}	
+\usepackage{indentfirst}	
+\usepackage[english, russian]{babel}	
+\usepackage{indentfirst}
+\usepackage{a4wide}	
+\usepackage{amsmath}
+\usepackage{amsthm} 
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{arcs}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[unicode, pdftex]{hyperref}
+
+
+\begin{document}
+\newcommand{\sgn}{\mathrm{sgn}}
+
+\begin{titlepage}
+\begin{center}
+\includegraphics[width=8cm, height=4cm]{msu.eps}
+\end{center}
+
+\begin{center}
+Московский государственный университет имени М.В. Ломоносова\\
+\vspace{0.2cm}
+Факультет вычислительной математики и кибернетики\\
+\vspace{0.2cm}
+Кафедра cистемного анализа
+
+\vspace{4cm}
+{\LARGE Отчёт по практикуму}\\
+\vspace{1cm}
+{\Huge\bfseries <<Линейная задача быстродействия>>}
+\end{center}
+
+\vspace{2cm}
+\begin{flushright}
+\large
+\textit{Студент 315 группы}\\
+Н.~Ю.~Заварзин\\
+\vspace{5mm}
+\textit{Руководитель практикума}\\
+к.ф.-м.н., доцент П.~A.~Точилин\\
+\end{flushright}
+\vspace{5cm}
+
+\begin{center}
+Москва, 2023
+\end{center}
+\end{titlepage}
+
+\newpage
+\section{Постановка задачи}
+Рассмотрим систему дифференциальных уравнений при $t \in$ \texttt{[$t_0,+\infty$)}
+\begin{equation}\label{eq1}
+\dot{x}(t) = A(t)x(t) + B(t)u(t) + f(t),
+\end{equation}
+\begin{equation*}
+x(t_0) \in \mathcal{X}_0,
+\end{equation*}
+\begin{equation*}
+x(t_1) \in \mathcal{X}_1. 
+\end{equation*} 
+
+Здесь $x(t) \in \mathbb{R}^2  $~--- фазовый вектор, $f(t) \in \mathbb{R}^2 $~--- заданный вектор, непрерывно зависящий от $t$, $u(t) \in \mathbb{R}^2 $~--- управление,$ \ A(t) \in \mathbb{R}^{2 \times 2}, B(t) \in \mathbb{R}^{2 \times 2}$~--- заданные матрицы, непрерывно зависящие от $t$, $t_0$~--- заданный начальный момент времени, $t_1$~--- конечный момент времени (не фиксирован). Заданы начальное множество значений фазового вектора $\mathcal{X}_0$~--- это квадрат со стороной длины $k$ и центром в $x^0$ (стороны квадрата параллельны осям координат), целевое множество значений фазового вектора $\mathcal{X}_1$, состоящее из одного элемента $x_1$, множество допустимых управлений $\mathcal{P} = \  = \mathcal{K}_1(p) + \mathcal{B}_r(0)$, где $\mathcal{K}_1(p)$~--- квадрат с единичной стороной и центром в точке $p$, а $\mathcal{B}_r(0) $~--- шар с радиусом $r$ и нулевым центром. Необходимо найти программное управление $u(\cdot) \in \mathcal{P}$, которое минимизирует функционал 
+\[\mathcal{J}(u(\cdot)) = t_1 - t_0, \] на траекториях системы~\eqref{eq1}.
+\section{Аналитическое решение задачи}
+\subsection{Принцип максимума Понтрягина}
+Пусть $u^{*}(\cdot)$~--- оптимальное управление, $x^{*}(\cdot)$~--- оптимальная траектория, $(t_{1}^{*} - t_0)$~--- оптимальное время. Тогда найдётся вектор-функция  $s^{*}(t) \in \mathbb{R}^2$, $s^{*}(t) \neq 0 \ $, которая удовлетворяет перечисленным ниже условиям.
+\begin{enumerate}
+\item Условию максимума
+\begin{equation}\label{eq2}
+\langle B^{T}(t) s^{*}(t), u^{*}(t) \rangle = \rho{(B^{T}(t)s^{*}(t) \ | \ \mathcal{P})} \ \ \ \  \forall t \in \texttt{[$t_0, t_1^*$]}. 
+\end{equation}
+\item Сопряженной системе
+\begin{equation}\label{eq3}
+\dot{s}^{*}(t) = -A^{T}(t)s^{*}(t) \ \ \ \  \forall t \in \texttt{[$t_0, t_1^*$]}.
+\end{equation}
+\item Условию трансверсальности для начального множества $\mathcal{X}_0$
+\begin{equation}\label{eq4}
+\langle s^{*}(t_0), x^{*}(t_0) \rangle = \rho{(s^{*}(t_0) \ | \  \mathcal{X}_0)}.
+\end{equation}
+\item Условию трансверсальности для конечного множества $\mathcal{X}_1$
+\begin{equation}\label{eq5}
+\langle -s^{*}(t_1^{*}), x^{*}(t_1^*) \rangle = \rho{(-s^{*}(t_1^{*}) \ | \  \mathcal{X}_1)}.
+\end{equation}
+\end{enumerate}
+
+\subsection{Опорные функции}
+\begin{enumerate}
+\item Найдём $ \rho{(s^{*}(t_0) \ | \ \mathcal{X}_0)}$~--- опорную функцию к начальному множеству $\mathcal{X}_0$. \\
+Обозначим за $\mathcal{K}_k $ квадрат со стороной длины $k$ и центром в 0 (стороны параллельны осям координат). А также определим $\mathcal{K}_k$ как сумму двух множеств: отрезка \texttt{[$-\frac{k}{2},\frac{k}{2}$]} по оси абсцисс ($\mathcal{Z}_1$) и отрезка \texttt{[$-\frac{k}{2},\frac{k}{2}$]} по оси ординат ($\mathcal{Z}_2$). Таким образом: 
+\[ \mathcal{X}_0 = \mathcal{K}_k + x^0 = \mathcal{Z}_1 + \mathcal{Z}_2 + x^0. \] 
+Пользуясь свойством аддитивности опорной функции по второму аргументу, получаем: 
+\[ \rho{(s^{*}(t_0) \ | \ \mathcal{X}_0)} = \rho{(s^{*}(t_0) \ | \ \mathcal{K}_k + x^0)} = \rho{(s^{*}(t_0) \ | \ \mathcal{Z}_1 + \mathcal{Z}_2 + x^0)} = \]
+\[ = \rho{(s^{*}(t_0) \ | \ \mathcal{Z}_1)} + \rho{(s^{*}(t_0) \ | \ \mathcal{Z}_2)} + \langle s^{*}(t_0), x^0 \rangle. \] 
+Раскладывая произвольный вектор $s^{*}(t_0)$ на компоненты по осям абсцисс и ординат, легко заметить, что 
+\[  \rho{(s^{*}(t_0) \ | \ \mathcal{Z}_1)} = |s_1^{*}(t_0)| \cdot \tfrac{k}{2}, \ \rho{(s^{*}(t_0) \ | \ \mathcal{Z}_2)}  |s_2^{*}(t_0)| \cdot \tfrac{k}{2} \Rightarrow \] 
+\[\Rightarrow \rho{(s^{*}(t_0) \ | \ \mathcal{X}_0)} = (|s_1^{*}(t_0)| + |s_2^{*}(t_0)|) \cdot \tfrac{k}{2} + \langle s^{*}(t_0), x^0 \rangle. \]
+
+\item Найдём $ \rho{(-s^{*}(t_1) \ | \ \mathcal{X}_1)}$~--- опорную функцию к конечному множеству $\mathcal{X}_1$. \\
+\[ \rho{(-s^{*}(t_1) \ | \ \mathcal{X}_1)} = \{ \text{Так как $\mathcal{X}_1$ состоит из одного элемента}\} = \langle -s^{*}(t_1), x_1 \rangle.\] 
+
+\item Найдём $ \rho{(B^{T}(t)s^{*}(t) \ | \ \mathcal{P})} $~--- опорную функцию к множеству допустимых управлений $\mathcal{P}$. \\
+Пользуясь тем, что \[\mathcal{P} = \mathcal{K}_1(p) + \mathcal{B}_r(0) = \mathcal{K}_1(0) + \mathcal{B}_r(0) + p \]
+и свойством аддитивности опорной функции по второму аргументу, получаем
+\[ \rho{(B^{T}(t)s^{*}(t) \ | \ \mathcal{P})} = \rho{(B^{T}(t)s^{*}(t) \ | \ \mathcal{K}_1(p) + \mathcal{B}_r(0))} = \rho{(B^{T}(t)s^{*}(t) \ | \ \mathcal{K}_1(0))} + \] 
+\[ + \rho{(B^{T}(t)s^{*}(t) \ | \ \mathcal{B}_r(0))} + \langle B^{T}(t)s^{*}(t), p \rangle. \]
+По доказанному выше, обозначив $B^{T}(t)s^{*}(t)$ за $h(t)$, имеем 
+\[ \rho{(h(t)\ | \ \mathcal{K}_1(0))} = (|h_1(t)| + |h_2(t)|) \cdot \tfrac{1}{2}. \]
+Выведем опорную функцию для круга радиуса $r$, с центром в 0
+\[ \langle h(t), u(t) \rangle \leqslant \{\  \text{по неравенству Коши-Буняковского} \ \} \leqslant \|h(t)\|_2 \cdot \|u(t)\|_2 \leqslant \|h(t)\|_2 \cdot r \Rightarrow \]
+\[ \Rightarrow \sup\limits_{u(t) \ \in \ \mathcal{B}_r(0)}{\langle h(t), u(t) \rangle} \leqslant \|h(t)\|_2 \cdot r. \]
+Заметим, что супремум равен $\|h(t)\|_2 \cdot r$ и достигается на $u(t) = \frac{h(t)}{\| h(t) \|_2} \cdot r.$ \\
+Таким образом, мы показали, что
+\[ \rho{(h(t) \ | \ \mathcal{B}_r(0))} = \|h(t)\|_2 \cdot r.\]
+Итак, собирая всё в кучу, запишем формулу для опорной функции к множеству $\mathcal{P}$
+\[ \rho{(h(t) \ | \ \mathcal{P})} = (|h_1(t)| + |h_2(t)|) \cdot \tfrac{1}{2} + \|h(t)\|_2 \cdot r + \langle h(t), p \rangle. \]
+
+\item Определим $ \rho{(l \ | \ \mathcal{X}\texttt{[t]})} $~--- опорную функцию к множеству достижимости в произвольный момент времени. Где $l$~--- направление, $l \in \mathbb{R}^2$, а $\mathcal{X}\texttt{[t]}$~--- множество достижимости в момент времени $t$. \\
+Заметим, что
+\[ \mathcal{X}\texttt{[t]} = \tilde{\mathcal{X}}\texttt{[t]} + \mathcal{X}_0, \] 
+$ \tilde{\mathcal{X}}\texttt{[t]} $~--- множество достижимости из фиксированной начальной точки $x_0$, лежащей в $\mathcal{X}_0$, в момент времени $t$. \\
+Найдём опорную функцию для множества $ \tilde{\mathcal{X}}\texttt{[t]} $
+\[ \rho{(l \ | \ \tilde{\mathcal{X}}\texttt{[t]})} = \{ \text{Используем формулу Коши для системы (1) с $x(t_0) = x_0$} \} = \] 
+\[= \sup\limits_{u(\cdot) \text{ } \text{допустимым}}{ \bigg{\{} \langle l, x \rangle \ \bigg{|} \ x = X(t, t_0)x_0 + \int\limits_{t_0}^{t}{ \left[ \  X(t, \tau)B(\tau)u(\tau) + X(t, \tau)f(\tau) \ \right]} \, \mathrm{d}\tau \bigg{\}} } = \] 
+\[ = \langle l, X(t, t_0)x_0 \rangle + \int\limits_{t_0}^{t}{ \langle l, X(t, \tau)f(\tau) \rangle} \, \mathrm{d}\tau + \sup\limits_{u(\cdot) \text{ } \text{допустимым}}{ \int\limits_{t_0}^{t}{ \langle l, X(t, \tau)B(\tau)u(\tau) \rangle} \, \mathrm{d}\tau} = \]
+\[ = \langle X^{T}(t, t_0)l, x_0 \rangle \ + \int\limits_{t_0}^{t}{ \langle X^{T}(t, \tau)l, f(\tau) \rangle} \, \mathrm{d}\tau \ + \sup\limits_{u(\cdot) \text{ } \text{допустимым}}{ \int\limits_{t_0}^{t}{ \langle B^{T}(\tau)X^{T}(t, \tau)l, u(\tau) \rangle} \, \mathrm{d}\tau} = \]
+\[ = \{ \text{Пользуясь леммой о перестановке интеграла и супремума} \} = \]
+\[ = \langle X^{T}(t, t_0)l, x_0 \rangle + \int\limits_{t_0}^{t}{ \langle X^{T}(t, \tau)l, f(\tau) \rangle} \, \mathrm{d}\tau + \int\limits_{t_0}^{t}{ \sup\limits_{u(\tau) \ \in \ \mathcal{P}}{\langle B^{T}(\tau)X^{T}(t, \tau)l, u(\tau) \rangle} \, \mathrm{d}\tau} = \]
+\[= \langle X^{T}(t, t_0)l, x_0 \rangle + \int\limits_{t_0}^{t}{ \langle X^{T}(t, \tau)l, f(\tau) \rangle} \, \mathrm{d}\tau + \int\limits_{t_0}^{t}{ \rho{(B^{T}(\tau)X^{T}(t, \tau)l \ | \  \mathcal{P}) \, \mathrm{d}\tau}}.\]
+Подытожив вышесказанное, имеем
+\[ \rho{(l \ | \ \mathcal{X}\texttt{[t]})} = \rho{(l \ | \ \tilde{\mathcal{X}}\texttt{[t]} + \mathcal{X}_0)} = \{ \text{Св-во аддитивности} \} = \rho{(l \ | \ \tilde{\mathcal{X}}\texttt{[t]})} \ + \rho{(l \ | \ \mathcal{X}_0)} = \]
+\[ = \rho{(l \ | \ \mathcal{X}_0)} + \langle X^{T}(t, t_0)l, x_0 \rangle + \int\limits_{t_0}^{t}{ \langle X^{T}(t, \tau)l, f(\tau) \rangle} \, \mathrm{d}\tau + \int\limits_{t_0}^{t}{ \rho{(B^{T}(\tau)X^{T}(t, \tau)l \ | \  \mathcal{P}) \, \mathrm{d}\tau}}.\]
+Подставляя вычисленные ранее $ \rho{(l \ | \ \mathcal{X}_0)}$ и $ \rho{(B^{T}(\tau)X^{T}(t, \tau)l \ | \  \mathcal{P})}$, приобретаем
+\[ \rho{(l \ | \ \mathcal{X}\texttt{[t]})} = (|l_1| + |l_2|) \cdot \tfrac{k}{2} + \langle l, x^0 \rangle + \langle X^{T}(t, t_0)l, x_0 \rangle + \int\limits_{t_0}^{t}{ \langle X^{T}(t, \tau)l, f(\tau) \rangle} \, \mathrm{d}\tau \ + \]
+\[ + \int\limits_{t_0}^{t}{ \left[  (|g_1(t, \tau)| + |g_2(t, \tau)|) \cdot \tfrac{1}{2} + \|g(t, \tau)\|_2 \cdot r + \langle g(t, \tau), p \rangle \right] \, \mathrm{d}\tau}, \ \ \text{$g(t, \tau) = B^{T}(\tau)X^{T}(t, \tau)l$}. \]
+Из системы дифференциальных уравнений \\
+$$\begin{cases}
+\dfrac{\mathrm{d}}{\mathrm{d}t}X(t, \tau) = A(t)X(t, \tau), \\
+X(\tau, \tau) = I
+\end{cases}$$ \\
+определяется фундаментальная матрица $X(t, \tau)$.
+
+\item Найдём $\mathcal{X}_0^{*}(l)$~--- опорное множество в зависимости от направления $l \in \mathbb{R}^{2}$, к множеству $\mathcal{X}_0$. Так как
+\[ \rho{(l \ | \ \mathcal{X}_0)} = \rho{(l \ | \ \mathcal{Z}_1)} + \rho{(l \ | \ \mathcal{Z}_2)} + \rho{(l \ | \ \{x^0\})} \Rightarrow \]
+\[ \Rightarrow \mathcal{X}_0^{*}(l) = \mathcal{Z}_1^{*}(l) + \mathcal{Z}_2^{*}(l) + x^0, \]
+где $\mathcal{Z}_1^{*}(l)$, $\mathcal{Z}_2^{*}(l)$~--- опорные множества в зависимости от $l$ к $\mathcal{Z}_1$ и $\mathcal{Z}_2$ соответственно.
+ 
+Определим $\mathcal{Z}_1^{*}(l), \mathcal{Z}_2^{*}(l)$ исходя из различных значений $l$.
+\begin{enumerate}
+\item $l_1 l_2 \neq 0$.\\
+Раскладывая $l$ на компоненты по осям абсцисс и ординат, не трудно заметить, что 
+\[ \mathcal{Z}_1^{*}(l) =  (\sgn(l_1) \cdot \tfrac{k}{2}, 0) , \ \  \mathcal{Z}_2^{*}(l) = (0, \sgn(l_2) \cdot \tfrac{k}{2}) \Rightarrow \]
+\[ \Rightarrow \mathcal{X}_0^{*}(l) = x^0 + (\sgn(l_1) \cdot \tfrac{k}{2}, \sgn(l_2) \cdot \tfrac{k}{2}). \]
+
+\item $l_1 = 0, \ l_2 \neq 0$. 
+\[ \mathcal{Z}_1^{*}(l) = \big{\{} (\alpha,0) \ \big{|} \  \alpha \in \texttt{[$-\tfrac{k}{2},\tfrac{k}{2}$]} \big{\}}, \ \  \mathcal{Z}_2^{*}(l) = (0, \sgn(l_2) \cdot \tfrac{k}{2}) \Rightarrow \]
+\[ \Rightarrow \mathcal{X}_0^{*}(l) = \big{\{} x^0 + (\alpha, \sgn(l_2) \cdot \tfrac{k}{2}) \  \big{|} \ \alpha \in \texttt{[$-\tfrac{k}{2},\tfrac{k}{2}$]} \big{\}} . \]
+
+\item $l_1 \neq 0,\  l_2 = 0$. 
+\[ \mathcal{Z}_1^{*}(l) = (\sgn(l_1) \cdot \tfrac{k}{2}, 0), \ \ \mathcal{Z}_2^{*}(l) = \big{\{} (0, \alpha) \ \big{|} \  \alpha \in \texttt{[$-\tfrac{k}{2},\tfrac{k}{2}$]} \big{\}} \Rightarrow \]
+\[ \Rightarrow \mathcal{X}_0^{*}(l) = \big{\{} x^0 + (\sgn(l_1) \cdot \tfrac{k}{2}, \alpha) \  \big{|} \ \alpha \in \texttt{[$-\tfrac{k}{2},\tfrac{k}{2}$]} \big{\}} . \]
+\end{enumerate}
+Итак, $$ \mathcal{X}_0^{*}(l) =
+\begin{cases}
+x^0 + (\sgn(l_1) \cdot \tfrac{k}{2}, \sgn(l_2) \cdot \tfrac{k}{2}), \ \ l_1 l_2 \neq 0 \\ 
+\big{\{} x^0 + (\alpha, \sgn(l_2) \cdot \tfrac{k}{2}) \  \big{|} \ \alpha \in \texttt{[$-\tfrac{k}{2},\tfrac{k}{2}$]} \big{\}}, \ \ l_1 = 0,\  l_2 \neq 0 \\
+\big{\{} x^0 + (\sgn(l_1) \cdot \tfrac{k}{2}, \alpha) \  \big{|} \ \alpha \in \texttt{[$-\tfrac{k}{2},\tfrac{k}{2}$]} \big{\}}, \ \ l_1 \neq 0, \ l_2 = 0.
+\end{cases}$$
+
+
+\item Найдём $\mathcal{P}^{*}(l)$~--- опорное множество в зависимости от направления $l \in \mathbb{R}^{2}$, к множеству $\mathcal{P}$. Так как
+\[ \rho{(l \ | \ \mathcal{P})} = \rho{(l \ | \ \mathcal{K}_1(0))} + \rho{(l \ | \ \mathcal{B}_r(0))} + \rho{(l \ | \  \{p\})} \Rightarrow \]
+\[ \Rightarrow \mathcal{P}^{*}(l) = \mathcal{K}_1^{*}(l) + \mathcal{B}_r^{*}(l) + p, \]
+где $\mathcal{K}_1^{*}(l)$, $\mathcal{B}_r^{*}(l)$~--- опорные множества в зависимости от $l$ к $\mathcal{K}_1(0)$ и $\mathcal{B}_r(0)$ соответственно. \\
+Взяв значение $\mathcal{X}_0^{*}(l)$ при $k = 1, x^0 = (0, 0)$, получим 
+$$ \mathcal{K}_1^{*}(l) =
+\begin{cases}
+(\sgn(l_1) \cdot \tfrac{1}{2}, \sgn(l_2) \cdot \tfrac{1}{2}), \ \ l_1 l_2 \neq 0 \\ 
+\big{\{} (\alpha, \sgn(l_2) \cdot \tfrac{1}{2}) \  \big{|} \ \alpha \in \texttt{[$-\tfrac{1}{2},\tfrac{1}{2}$]} \big{\}}, \ \ l_1 = 0, \  l_2 \neq 0 \\
+\big{\{} (\sgn(l_1) \cdot \tfrac{1}{2}, \alpha) \  \big{|} \ \alpha \in \texttt{[$-\tfrac{1}{2},\tfrac{1}{2}$]} \big{\}}, \ \ l_1 \neq 0, \  l_2 = 0.
+\end{cases}$$
+Из вывода опорной функции к $\mathcal{B}_r(0)$ можно заметить, что $\sup\limits_{u(t) \ \in \ \mathcal{B}_r(0)}{\langle l, u(t) \rangle}$ достигается при выполнении двух условий.
+\begin{enumerate}
+
+\item Достигается равенство в неравенстве Коши-Буняковского $\Rightarrow u^{*}(t) = l \cdot \alpha,$ где $\alpha \in \mathbb{R} $, а $u^{*}(t)$~--- значение управления в момент времени $t$, на котором достигается супремум.
+\item Точки опорного множества должны лежать на границе круга $\Rightarrow$ \[ \Rightarrow \| u^{*}(t) \|_2 = \| l \|_2 \cdot |\alpha| = r \Rightarrow  \bigg{\{} \alpha = \pm \frac{r}{\| l \|_2} \bigg{\}} \Rightarrow u^{*}(t) = \frac{l}{\| l \|_2} \cdot r, \]
+тут $\alpha$ берётся с плюсом, так как иначе скалярное произведение становится отрицательным.
+\end{enumerate}
+Итого, $$ \mathcal{P}^{*}(l) =
+\begin{cases}
+\left( \sgn(l_1) \cdot \dfrac{1}{2}, \sgn(l_2) \cdot \dfrac{1}{2} \right) + \dfrac{l}{\| l \|_2} \cdot r + p, \ \ l_1 l_2 \neq 0 \\ 
+\bigg{\{} \left( \alpha, \sgn(l_2) \cdot \dfrac{1}{2} \right) + \dfrac{l}{\| l \|_2} \cdot r + p \  \bigg{|} \ \alpha \in \bigg{[} -\dfrac{1}{2},\dfrac{1}{2} \bigg{]} \bigg{\}}, \ \ l_1 = 0, \ l_2 \neq 0 \\
+\bigg{\{} \left( \sgn(l_1) \cdot \dfrac{1}{2}, \alpha \right) + \dfrac{l}{\| l \|_2} \cdot r + p \  \bigg{|} \ \alpha \in \bigg{[} -\dfrac{1}{2},\dfrac{1}{2} \bigg{]} \bigg{\}}, \ \ l_1 \neq 0, \ l_2 = 0.
+\end{cases} $$
+\end{enumerate}
+
+\section{Приближенное решение задачи}
+
+\subsection{Алгоритм построения решений}
+
+\begin{itemize}
+\item \textbf{Ввод данных} \\
+В начале программы реализован пользовательский интерфейс, позволяющий ввести параметры системы: $A, \ B, \ f, \ x^0, \ k, \ p, \ r, \ x_1, \ t_0$, смысловое значение которых было указано выше при постановке задачи. Затем пользователю предлагается ввести параметры численного метода.
+\par
+$\texttt{$t_{max}$}$~--- максимальная продолжительность построения пробных траекторий, которая разбивается на равные кусочки вторым параметром. 
+\par
+$\texttt{step}$~--- шаги вычисления пробных траекторий. Необходимость введения этого параметра состоит в том, чтобы при попадании в заданное множество (остановке построения текущей траектории) не было большого числа лишних вычислений параметров $s(t), \ u(t)$. 
+\par
+$\texttt{coeff}$~--- число отсчётов в одном шаге. 
+\par
+$n$~--- число направлений $l$ в равномерной единичной круговой сетке, имеющих смысл значений сопряженной переменной в конечный момент времени.
+
+\item \textbf{Основная часть} \\
+Проверяем, лежит ли конечная точка в стартовом множестве, если да, то завершаем программу с характерным выводом о разрешимости задачи за нулевое время. Иначе перейдём к алгоритму построения решений. Для удобства будем решать поставленную задачу с конца, оптимальное решение от этого не поменяется. Новая система дифференциальных уравнений примет вид при $t \in$ \texttt{[$t_0,+\infty$)}
+\[\dot{\tilde{x}}(t) = A(t_1 + t_0 - t)\tilde{x}(t) + B(t_1 + t_0 - t) \tilde{u}(t) + f(t_1 + t_0 - t),\] 
+\[\tilde{x}(t_0) \in \mathcal{X}_1, \] 
+\[\tilde{x}(t_1) \in \mathcal{X}_0. \]
+
+Где $\tilde{x}(t) = x(t_1 + t_0 - t)$, $\tilde{u}(t) = u(t_1 + t_0 - t)$. Учитывая, что матрицы $A, B, f$ задаются постоянными, имеем систему дифференциальных уравнений при $t \in$ \texttt{[$t_0,+\infty$)} 
+\[\dot{\tilde{x}}(t) = A\tilde{x}(t) + B\tilde{u}(t) + f,\] 
+\[\tilde{x}(t_0) \in \mathcal{X}_1, \] 
+\[\tilde{x}(t_1) \in \mathcal{X}_0. \]
+Заметим, что мы получили изначальную систему \eqref{eq1}, с той лишь разницей, что здесь $\mathcal{X}_1$ стало начальным множеством, а $\mathcal{X}_0$~--- конечным. Ниже приведены основные этапы решения.
+ 
+\begin{enumerate}
+ 
+\item Задаём нормированную равномерную круговую сетку из $l$~--- значений сопряженного вектора в начальный момент времени. Количество элементов в сетке равно $n$~--- параметру численного метода, задаваемому ранее. Далее для каждого фиксированного $l$ проделываем указанные ниже пункты 2-5.
+
+\item Разобьём текущее максимальное время $\texttt{$t_{best}$}$ (изначально равное $\texttt{$t_{max}$}$, но в случае нахождения скорейшего решения изменяется на соответствующее время) на отрезки величиной $\texttt{step}$ (последний отрезок, разумеется, как правило короче). Для каждого такого отрезка, пока мы не достигнем конечного множества или не превысим лимит по времени будем строить $s(t)$, $\tilde{u}(t)$, $\tilde{x}(t)$. C помощью встроенной в $\texttt{matlab}$ функции $\texttt{ode45}$ определим на текущем шаге $s(t)$ как решение системы
+$$\begin{cases} 
+\dfrac{\mathrm{d}}{\mathrm{d}t}s(t) = -A^{T}s(t), \\
+s(t_0) = l.  
+\end{cases} $$
+
+\item Так как для оптимальной пары ($x(\cdot), u(\cdot)$) должно выполняться условие максимума \eqref{eq2}, используем вычисленную формулу $\mathcal{P}^*(l)$ и вычисленное значение $s(t)$ для нахождения оптимального в данном случае управления. В этом месте может возникнуть неоднозначность, вызванная вырожденностью матрицы $B$ или нулевым значением одной из компонент вектора $s(t)$. В связи с чем, дабы избегнуть дополнительного перебора по управлениям прибегнем к следующим хитростям.
+
+\begin{enumerate}
+
+\item $|B| = 0 \Rightarrow B := B + \lambda I$, где $I$~--- единичная матрица, а $\lambda$ некоторое маленькое значение. Матрица $B$ станет невырожденной, так как нарушится линейная связь её столбцов.
+
+\item $(s(t))_1 = 0 \Rightarrow (s(t))_1 := \lambda.$
+
+\item $(s(t))_2 = 0 \Rightarrow (s(t))_2 := \lambda.$
+
+\end{enumerate}
+
+Таким образом, управление на данном шаге примет однозначный вид
+\[ \tilde{u}(t) = \left( \sgn((B^{T}(t) s(t))_1) \cdot \dfrac{1}{2}, \sgn((B^{T}(t) s(t))_2) \cdot \dfrac{1}{2} \right) + \dfrac{B^{T}(t) s(t)}{\| B^{T}(t) s(t) \|_2} \cdot r + p.\]
+
+\item Используя встроенную в $\texttt{matlab}$ функцию $\texttt{ode45}$ построим часть траектории на текущем шаге, как решение 
+\[ \dot{\tilde{x}}(t) = A\tilde{x}(t) + B\tilde{u}(t) + f \]
+\[\tilde{x}(t_0) = x_1, \]
+с условием остановки в случае достижения $\mathcal{X}_0$.
+
+\item Построив траекторию на каждом шаге, сбрасываем её в память, попутно регулируя время $\texttt{$t_{best}$}$ и запоминая номер, если траектория оказалась самой быстрой. 
+
+\end{enumerate}
+
+\item \textbf{Вывод результатов} \\
+Если было найдено решение, то по желанию пользователя предусмотрен вывод графиков в осях $(x_1, x_2)$, $(u_1, u_2)$, $(t, x_1)$, $(t, x_2)$, $(t, s_1)$, $(t, s_2)$, $(t, u_1)$, $(t, u_2)$, с встроенными опциями вывода только оптимальной траектории или вывода всех пробных траекторий. При выводе учитывается, что решение строилось с конца. Далее выводится время быстродействия и погрешность условия трансверсальности \eqref{eq5}. Значение погрешности $\Delta$, после нормировки вектора $s^*(t_1)$, вычисляем как
+\[ \Delta = | \  \langle -s^{*}(t_1), x^{*}(t_1) \rangle - \rho{(-s^*(t_1) \ | \  \mathcal{X}_0)} \ | .\]
+Если же задача оказалась неразрешимой (ни одна из пробных траекторий не достигла конечного множества в рамках $t_{max}$), то выводятся графики во всех осях и сообщение о неразрешимости задачи.
+
+\item \textbf{Улучшение результатов расчётов} \\
+Улучшение результатов расчётов предусмотрено двух видов: глобальное, суть которого состоит в повышении точности решения, посредством прореживания сетки перебора начальных значений сопряженного вектора и локальное~--- то же самое, но в рамках определенного углового сектора. Оба варианта реализованы посредством функций: $\texttt{globalAdd}$ и $\texttt{localAdd}$ соответственно. Устроены эти функции также как и основной алгоритм (пункты 1-5) с разницей лишь в задании сетки. Также стоит отметить, что указанные выше функции работают таким образом, что вычисленные до этого траектории по заданным ранее направлениям не пересчитываются.
+\end{itemize} 
+
+\subsection{Примеры}
+\begin{enumerate}
+\item Прогоним алгоритм на системе, со следующими параметрами: 
+\[
+A = \begin{pmatrix}
+  0 & 1 \\
+  1 & 0
+\end{pmatrix}, \ 
+B = \begin{pmatrix} 
+  0 & 1 \\
+  1 & 0
+\end{pmatrix}, \ 
+f = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}, \ 
+x^0 = \begin{pmatrix}
+  2\\
+  2
+\end{pmatrix}^\mathrm{T}, \ 
+k = 1,  \ 
+p = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T}, \ 
+r = 1, \ 
+x_1 = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T},\] 
+\[ t_0 = 0, \  \mathrm{step} = 1, \  \mathrm{coeff} = 1000, \  \mathrm{t_{max}} = 10, \ \mathrm{n} = 112.\]
+Задача оказалась разрешимой, время быстродействия $T = 0.80765$ секунд, погрешность условия трансверсальности для множества $\mathcal{X}_0$ равна 2.7978$\mathrm{e-}$14. Ниже представлен ряд графиков, отражающих результат работы построенного алгоритма для данной системы. Синим цветом изображены параметры пробных траекторий, из которых красным выделены оптимальные. Чёрным цветом обозначается конечное множество $\mathcal{X}_1$, зелёным~--- начальное $\mathcal{X}_0$, жёлтым~--- множество допустимых управлений $\mathcal{P}$. 
+
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP2}}
+\caption{График траекторий в осях $(x_1, x_2)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP4}} 
+\caption{График траекторий в осях $(u_1, u_2)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP6}}
+\caption{График траекторий в осях $(t, x_1)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP8}}
+\caption{График траекторий в осях $(t, x_2)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP10}}
+\caption{График траекторий в осях $(t, s_1)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP12}}
+\caption{График траекторий в осях $(t, s_2)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP14}}
+\caption{График траекторий в осях $(t, u_1)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{PMP16}}
+\caption{График траекторий в осях $(t, u_2)$}
+\end{figure}
+
+\newpage
+\item Параметры системы: 
+\[A = \begin{pmatrix}
+  2 & 1 \\
+  1 & 0
+\end{pmatrix}, \ 
+B = \begin{pmatrix}
+  0 & 1 \\
+  1 & 0
+\end{pmatrix}, \ 
+f = \begin{pmatrix}
+  1\\
+  0
+\end{pmatrix}, \ 
+x^0 = \begin{pmatrix}
+  2\\
+  0.5
+\end{pmatrix}^\mathrm{T}, \ 
+k = 0.9, \  
+p = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T}, \ 
+r = 1, \  
+x_1 = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T}, \] 
+\[t_0 = 0, \  \mathrm{step} = 1, \  \mathrm{coeff} = 1000, \ \mathrm{t_{max}} = 10, \  \mathrm{n} = 100.\] 
+Результат работы алгоритма для данной системы: $T = 1.0037$ секунд, погрешность равна 0.0039906. Синим цветом изображены пробные траектории, из которых красным выделена оптимальная. Чёрным цветом обозначается конечное множество $\mathcal{X}_1$, зелёным~--- начальное~$\mathcal{X}_0$.
+
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{Second.eps}}
+\caption{График построенных траекторий в осях $(x_1, x_2)$}
+\end{figure}
+
+\item Параметры системы: 
+\[A = \begin{pmatrix}
+  0 & 1 \\
+  1 & 0
+\end{pmatrix}, \ 
+B = \begin{pmatrix}
+  0 & 0 \\
+  0 & 0
+\end{pmatrix}, \ 
+f = \begin{pmatrix}
+  1\\
+  0
+\end{pmatrix}, \ 
+x^0 = \begin{pmatrix}
+  2\\
+  0.5
+\end{pmatrix}^\mathrm{T}, \ 
+k = 0.9, \ 
+p = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T}, \ 
+r = 1, \ 
+x_1 = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T},\]
+\[ t_0 = 0, \  \mathrm{step} = 1, \ \mathrm{coeff} = 1000, \ \mathrm{t_{max}} = 10, \ \mathrm{n} = 100.\] 
+Результат работы алгоритма для данной системы: $T = 1.231$ секунд, погрешность равна 0.0034907. Синим цветом изображены пробные траектории, из которых красным выделена оптимальная. Чёрным цветом обозначается конечное множество $\mathcal{X}_1$, зелёным~--- начальное~$\mathcal{X}_0$.
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{Third}}
+\caption{График построенных траекторий в осях $(x_1, x_2)$}
+\end{figure}
+
+\item В этом примере исследуем разрывную зависимость $T$~--- времени быстродействия от расположения начального множества системы $\mathcal{X}_0$. Значения $x^0$ для сравнения берём равными 
+$\begin{pmatrix}
+  2\\
+  1.6
+\end{pmatrix}^\mathrm{T}$ и 
+$\begin{pmatrix}
+  2\\
+  1.7
+\end{pmatrix}^\mathrm{T}$ соответственно, остальные параметры системы: 
+\[A = \begin{pmatrix}
+  0 & -1 \\
+  1 & 0
+\end{pmatrix}, \ 
+B = \begin{pmatrix}
+  1 & 0 \\
+  0 & 1
+\end{pmatrix}, \ 
+f = \begin{pmatrix}
+  10\\
+  1
+\end{pmatrix}, \ 
+x_1 = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T}, \ 
+k = 1, \  
+p = \begin{pmatrix}
+  0\\
+  0
+\end{pmatrix}^\mathrm{T}, \ 
+r = 2, \ 
+t_0 = 0, \] 
+\[ \mathrm{step} = 1, \ \mathrm{coeff} = 1000, \ \mathrm{t_{max}} = 10, \ \mathrm{n} = 100. \] 
+В первом случае получаем $T = 0.23383$ секунд, во втором: $T = 4.9128$ секунды. При изменении координаты центра начального множества на одну десятую мы получили скачок времени быстродействия в двадцать один раз, что подтверждает искомую нами разрывную зависимость. Ниже приведены две соответствующие иллюстрации. Синим цветом изображены пробные траектории, из которых красным выделена оптимальная. Чёрным цветом обозначается конечное множество $\mathcal{X}_1$, зелёным~--- начальное $\mathcal{X}_0$.
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{Разрывная2}}
+\caption{График построенных траекторий в осях $(x_1, x_2)$}
+\end{figure}
+\begin{figure}[H]
+\centering{\includegraphics[height=11cm]{Разрывная1.eps}}
+\caption{График построенных траекторий в осях $(x_1, x_2)$}
+\end{figure}
+\end{enumerate}
+
+\newpage
+\begin{thebibliography}{99}
+\item Киселёв~Ю.~Н., Аввакумов~С.~Н., Орлов~М.~В. Оптимальное управление. Линейная теория и приложения. М.: Издательский отдел факультета ВМиК МГУ им. М.~В.~Ломоносова, 2007.  
+
+
+\end{thebibliography}
+\end{document}
