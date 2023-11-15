@@ -1,4 +1,5 @@
 %%
+%Main
 clear, clc;
  
 [A, B, f, x_0, k, p, r, x_1, t_0] = odeInput();
@@ -41,6 +42,7 @@ else
 end
   
 %%
+%Functions
 function [A, B, f, x_0, k, p, r, x_1, t_0] = odeInput()
     A = input('Введите матрицу A\n');
     while ~check_2x2(A)
@@ -488,7 +490,8 @@ function draw_graphics(x_memory, s_memory, u_memory, x_0, k, p, r, x_1, t_0, t_1
 end
 
 %Измельчение сетки в определённом угловом секторе и построение соответствующих траекторий
-function [x_memory, s_memory, u_memory, s_best, i_best, t_best, t_1_best] = local_add(min_angle, max_angle, n, A, B, f, x_0, k, p, r, x_1, t_0, step, coeff, t_max, s_old, u_old, x_old, i_best_old, t_1_best_old)
+function [x_memory, s_memory, u_memory, s_best, i_best, t_best, t_1_best] = local_add(min_angle, max_angle, n, A, B, f, x_0, k, p, r, x_1, ...
+                                                                       t_0, step, coeff, t_max, s_old, u_old, x_old, i_best_old, t_1_best_old)
     
     l(1 : n, 1 : 2) = zeros(n, 2);
     for i = 1 : n
@@ -498,11 +501,13 @@ function [x_memory, s_memory, u_memory, s_best, i_best, t_best, t_1_best] = loca
 
     [t_1_best, x_memory, s_memory, u_memory, i_best, t] = trajectoriesBuilding(A, B, f, x_0, k, p, r, x_1, t_0, step, coeff, t_max, n, l);
   
-    [x_memory, s_memory, u_memory, s_best, i_best, t_best] = results(t_1_best, t_1_best_old, x_memory, s_memory, u_memory, i_best, t, i_best_old, x_old, s_old, u_old, coeff, x_0, k, p, r, x_1, t_0);
+    [x_memory, s_memory, u_memory, s_best, i_best, t_best] = results(t_1_best, t_1_best_old, x_memory, s_memory, u_memory, i_best, t, ...
+                                                                     i_best_old, x_old, s_old, u_old, coeff, x_0, k, p, r, x_1, t_0);
 end
 
 %Измельчение сетки в целое число раз глобально (по всем направлениям) и построение соответствующих траекторий
-function [x_memory, s_memory, u_memory, s_best, i_best, t_best, n_new, t_1_best] = global_add(n_old, n_new, A, B, f, x_0, k, p, r, x_1, t_0, step, coeff, t_max, s_old, u_old, x_old, i_best_old, t_1_best_old)
+function [x_memory, s_memory, u_memory, s_best, i_best, t_best, n_new, t_1_best] = global_add(n_old, n_new, A, B, f, x_0, k, p, r, x_1, ...
+                                                                     t_0, step, coeff, t_max, s_old, u_old, x_old, i_best_old, t_1_best_old)
     
     k = n_new / n_old;
     n = n_new - n_old;
@@ -515,10 +520,12 @@ function [x_memory, s_memory, u_memory, s_best, i_best, t_best, n_new, t_1_best]
     
     [t_1_best, x_memory, s_memory, u_memory, i_best, t] = trajectoriesBuilding(A, B, f, x_0, k, p, r, x_1, t_0, step, coeff, t_max, n, l);
     
-    [x_memory, s_memory, u_memory, s_best, i_best, t_best] = results(t_1_best, t_1_best_old, x_memory, s_memory, u_memory, i_best, t, i_best_old, x_old, s_old, u_old, coeff, x_0, k, p, r, x_1, t_0);
+    [x_memory, s_memory, u_memory, s_best, i_best, t_best] = results(t_1_best, t_1_best_old, x_memory, s_memory, u_memory, i_best, t, ...
+                                                                     i_best_old, x_old, s_old, u_old, coeff, x_0, k, p, r, x_1, t_0);
 end
 
-function [x_memory, s_memory, u_memory, s_best, i_best, t_best] = results(t_1_best, t_1_best_old, x_memory, s_memory, u_memory, i_best, t, i_best_old, x_old, s_old, u_old, coeff, x_0, k, p, r, x_1, t_0)
+function [x_memory, s_memory, u_memory, s_best, i_best, t_best] = results(t_1_best, t_1_best_old, x_memory, s_memory, u_memory, i_best, ...
+                                                                          t, i_best_old, x_old, s_old, u_old, coeff, x_0, k, p, r, x_1, t_0)
 
     if (i_best ~= 0 || i_best_old ~= 0)
 
